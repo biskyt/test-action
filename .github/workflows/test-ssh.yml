@@ -65,10 +65,12 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           no-cache: true
-          context: .
+          context: ./Web-Live
           push: false
           build-args: |
             BUILD_BRANCH=${{ env.GITHUB_REF_NAME }}
+            PHP_VERSION="8.0"
+            MODULES="openeyes eyedraw OphInCococa"
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           # ssh: "${{ secrets.TKL_DEPLOY_PRIVATE_KEY }}"
