@@ -18,8 +18,12 @@ jobs:
         uses: webfactory/ssh-agent@v0.5.3
         with:
             ssh-private-key: ${{ secrets.TKL_DEPLOY_PRIVATE_KEY }}
-      - name: test login
-        run: ssh -T git@github.com
+      - uses: actions/checkout@v2
+        with: 
+          repository: ToukanLabs/OEImageBuilder
+
+      - name: test  
+        run: ls -lah
 
     #   - name: Check out
     #     # git clone from OEImageBuilder - will need SSH configuring
