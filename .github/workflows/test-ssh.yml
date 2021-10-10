@@ -64,16 +64,16 @@ jobs:
       - name: Build and push production image
         uses: docker/build-push-action@v2
         with:
-          no-cache: true
+          ssh: |
+              default=${{ env.SSH_AUTH_SOCK }}
           context: ./Web-Live
           push: false
           build-args: |
-            CACHEBUSTER=20211010171700
             BUILD_BRANCH=${{ env.GITHUB_REF_NAME }}
-            MODULES=openeyes eyedraw OphInCococa
+            MODULES=
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          # ssh: "${{ secrets.TKL_DEPLOY_PRIVATE_KEY }}"
+          
 
 ###########################
     #   - name: Check out
