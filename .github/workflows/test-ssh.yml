@@ -49,14 +49,13 @@ jobs:
 
         # Just add this  => 
       - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v3.x
-
-
+        uses: rlespinasse/github-slug-action@v3
 
       # And you get this  => 
       - name: Print slug/short variables
         run: |
           echo "Slug variables"
+          echo " - __ ${{ env.GITHUB_REF_NAME }} __"
           echo " - ${{ env.GITHUB_REF_SLUG }}"    
           echo " - ${{ env.GITHUB_HEAD_REF_SLUG }}"
           echo " - ${{ env.GITHUB_BASE_REF_SLUG }}"
