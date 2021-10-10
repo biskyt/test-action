@@ -64,14 +64,14 @@ jobs:
       - name: Build and push production image
         uses: docker/build-push-action@v2
         with:
+          no-cache: true
           context: ./Web-Live
           push: false
           build-args: |
             BUILD_BRANCH=${{ env.GITHUB_REF_NAME }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          ssh: "${{ secrets.TKL_DEPLOY_PRIVATE_KEY }}"
-          no-cache: true
+          # ssh: "${{ secrets.TKL_DEPLOY_PRIVATE_KEY }}"
 
 ###########################
     #   - name: Check out
