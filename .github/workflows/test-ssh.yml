@@ -70,7 +70,7 @@ jobs:
           build-args: |
             CACHEBUSTER=20211010171700
             BUILD_BRANCH=${{ env.GITHUB_REF_NAME }}
-            MODULES="openeyes eyedraw OphInCococa"
+            MODULES=openeyes eyedraw OphInCococa
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           # ssh: "${{ secrets.TKL_DEPLOY_PRIVATE_KEY }}"
