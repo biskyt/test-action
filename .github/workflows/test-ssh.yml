@@ -1,4 +1,4 @@
-name: Publish Docker image
+name: Publish Docker images
 
 on:
   push:
@@ -13,7 +13,7 @@ on:
 
 jobs:
   push_to_registry:
-    name: Push Docker image to Docker Hub
+    name: Build and push production images
     runs-on: ubuntu-latest
     steps:
       
@@ -49,7 +49,7 @@ jobs:
 
         # Just add this  => 
       - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@v3
+        uses: rlespinasse/github-slug-action@v3.x
 
       # And you get this  => 
       - name: Print slug/short variables
