@@ -14,18 +14,74 @@ jobs:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     steps:
+      
+      - name: Checkout OEBuilder
+        uses: actions/checkout@v2
+        with: 
+          repository: ToukanLabs/OEImageBuilder
+          ref: master
+          ssh-key: ${{ secrets.TKL_DEPLOY_PRIVATE_KEY }}
+
       - name: Setup SSH Agent
         uses: webfactory/ssh-agent@v0.5.3
         with:
             ssh-private-key: ${{ secrets.TKL_DEPLOY_PRIVATE_KEY }}
-      - uses: actions/checkout@v2
-        with: 
-          repository: ToukanLabs/OEImageBuilder
-          ssh-key: ${{ secrets.TKL_DEPLOY_PRIVATE_KEY }}
 
-      - name: test  
-        run: ls -lah
+      - name: Setup Docker metadata tags
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: toukanlabsdocker/oe-web
+          # Only apply the latest tag to the master branch for the primary image
+          flavor: |
+            latest=${{ contains(github.ref,'refs/heads/master') }}
+          # set tags to symantic versions for each release.
+          # NOTE: for semver, the tag must contain 3x parts 1.2.3 (e.g v4.1.0)
+          tags: |
+            type=ref,event=branch
+            type=ref,event=tag
+            type=semver,pattern=v{{version}}
+            type=semver,pattern=v{{major}}.{{minor}}
+            type=semver,pattern==v{{major}}
+            type=edge,branch=develop
 
+        # Just add this  => 
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v3.x
+
+
+
+      # And you get this  => 
+      - name: Print slug/short variables
+        run: |
+          echo "Slug variables"
+          echo " - ${{ env.GITHUB_REF_SLUG }}"    
+          echo " - ${{ env.GITHUB_HEAD_REF_SLUG }}"
+          echo " - ${{ env.GITHUB_BASE_REF_SLUG }}"
+          echo " - ${{ env.GITHUB_REPOSITORY_SLUG }}"
+          # output e.g. : master feat-new-feature v1.0.0 product-1.0.0-rc.2 new-awesome-product
+          echo "Slug URL variables"
+          echo " - ${{ env.GITHUB_REF_SLUG_URL }}"
+          echo " - ${{ env.GITHUB_HEAD_REF_SLUG_URL }}"
+          echo " - ${{ env.GITHUB_BASE_REF_SLUG_URL }}"
+          echo " - ${{ env.GITHUB_REPOSITORY_SLUG_URL }}"
+          # output e.g. : master feat-new-feature v1-0-0 product-1-0-0-rc-2 new-awesome-product
+          echo "Short SHA variables"
+          echo " - ${{ env.GITHUB_SHA_SHORT }}"
+          # output e.g. : ffac537e
+
+
+      # - name: Build and push production image
+      #   uses: docker/build-push-action@v2
+      #   with:
+      #     context: ./Web-Live
+      #     push: false
+      #     build-args: |
+      #       BUILD_BRANCH=
+      #     tags: ${{ steps.meta.outputs.tags }}
+      #     labels: ${{ steps.meta.outputs.labels }}
+
+###########################
     #   - name: Check out
     #     # git clone from OEImageBuilder - will need SSH configuring
 
