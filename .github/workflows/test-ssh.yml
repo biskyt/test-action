@@ -67,7 +67,7 @@ jobs:
           ssh: |
               default=${{ env.SSH_AUTH_SOCK }}
           context: ./Web-Live
-          # push: false
+          push: true
           build-args: |
             BUILD_BRANCH=${{ env.GITHUB_REF_NAME }}
             MODULES=
