@@ -56,28 +56,28 @@ jobs:
       #     username: ${{ secrets.DOCKER_USERNAME }}
       #     password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+      # - name: Set up Docker Buildx
+      #   uses: docker/setup-buildx-action@v1
 
 ###########  Live image
 
-      - name: Setup Docker metadata tags for Live image
-        id: meta-live
-        uses: docker/metadata-action@v3
-        with:
-          images: toukanlabsdocker/oe-web-live
-          # Only apply the latest tag to the master branch
-          flavor: |
-            latest=${{ contains(github.ref,'refs/heads/master') }}
-          # set tags to symantic versions for each release.
-          # NOTE: for semver, the tag must contain 3x parts 1.2.3 (e.g v4.1.0)
-          tags: |
-            type=ref,event=branch
-            type=ref,event=tag
-            type=semver,pattern=v{{version}}
-            type=semver,pattern=v{{major}}.{{minor}}
-            type=semver,pattern=v{{major}}
-            type=edge,branch=develop
+      # - name: Setup Docker metadata tags for Live image
+      #   id: meta-live
+      #   uses: docker/metadata-action@v3
+      #   with:
+      #     images: toukanlabsdocker/oe-web-live
+      #     # Only apply the latest tag to the master branch
+      #     flavor: |
+      #       latest=${{ contains(github.ref,'refs/heads/master') }}
+      #     # set tags to symantic versions for each release.
+      #     # NOTE: for semver, the tag must contain 3x parts 1.2.3 (e.g v4.1.0)
+      #     tags: |
+      #       type=ref,event=branch
+      #       type=ref,event=tag
+      #       type=semver,pattern=v{{version}}
+      #       type=semver,pattern=v{{major}}.{{minor}}
+      #       type=semver,pattern=v{{major}}
+      #       type=edge,branch=develop
 
       - name: Build Live image
         uses: docker/build-push-action@v2
