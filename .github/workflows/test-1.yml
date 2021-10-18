@@ -84,6 +84,7 @@ jobs:
       - name: Build and push Live image
         uses: docker/build-push-action@v2
         with:
+          local: true
           ssh: |
               default=${{ env.SSH_AUTH_SOCK }}
           context: ./Web-Live
@@ -94,13 +95,13 @@ jobs:
           tags: ${{ steps.meta-live.outputs.tags }}
           labels: ${{ steps.meta-live.outputs.labels }}
 
-      - name: Update Docker Hub Description for Live image
-        uses: peter-evans/dockerhub-description@v2
-        with:
-          readme-filepath: ./Web-Live/README.md
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: biskyt/oe-web-live
+      # - name: Update Docker Hub Description for Live image
+      #   uses: peter-evans/dockerhub-description@v2
+      #   with:
+      #     readme-filepath: ./Web-Live/README.md
+      #     username: ${{ secrets.DOCKER_USERNAME }}
+      #     password: ${{ secrets.DOCKER_PASSWORD }}
+      #     repository: biskyt/oe-web-live
 
 ###########  Database Bootstrap image
 
@@ -137,13 +138,13 @@ jobs:
           tags: ${{ steps.meta-dbboot.outputs.tags }}
           labels: ${{ steps.meta-dbboot.outputs.labels }}
 
-      - name: Update Docker Hub Description for DatabaseBootstrap image
-        uses: peter-evans/dockerhub-description@v2
-        with:
-          readme-filepath: ./DatabaseBootstrap/README.md
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: biskyt/oe-db-bootstrap
+      # - name: Update Docker Hub Description for DatabaseBootstrap image
+      #   uses: peter-evans/dockerhub-description@v2
+      #   with:
+      #     readme-filepath: ./DatabaseBootstrap/README.md
+      #     username: ${{ secrets.DOCKER_USERNAME }}
+      #     password: ${{ secrets.DOCKER_PASSWORD }}
+      #     repository: biskyt/oe-db-bootstrap
 
 
 # THE NEXT 2 IMAGES ARE NOT YET READY OR NEEDED, so are commented out at this time
