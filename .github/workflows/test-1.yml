@@ -60,6 +60,7 @@ jobs:
         uses: docker/setup-buildx-action@v1
         with:
           driver: docker
+          # driver: docker is required to allow images to be reused by subsequent steps
 
 ###########  Live image
 
@@ -67,7 +68,7 @@ jobs:
         id: meta-live
         uses: docker/metadata-action@v3
         with:
-          images: biskyt/oe-web-live
+          images: toukanlabsdocker/oe-web-live
           # Only apply the latest tag to the master branch
           flavor: |
             latest=${{ contains(github.ref,'refs/heads/master') }}
@@ -84,24 +85,23 @@ jobs:
       - name: Build and push Live image
         uses: docker/build-push-action@v2
         with:
-          local: true
           ssh: |
               default=${{ env.SSH_AUTH_SOCK }}
           context: ./Web-Live
-          push: false
+          push: true
           build-args: |
             BUILD_BRANCH=${{ env.GITHUB_REF_NAME }}
             MODULES=
           tags: ${{ steps.meta-live.outputs.tags }}
           labels: ${{ steps.meta-live.outputs.labels }}
 
-      # - name: Update Docker Hub Description for Live image
-      #   uses: peter-evans/dockerhub-description@v2
-      #   with:
-      #     readme-filepath: ./Web-Live/README.md
-      #     username: ${{ secrets.DOCKER_USERNAME }}
-      #     password: ${{ secrets.DOCKER_PASSWORD }}
-      #     repository: biskyt/oe-web-live
+      - name: Update Docker Hub Description for Live image
+        uses: peter-evans/dockerhub-description@v2
+        with:
+          readme-filepath: ./Web-Live/README.md
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: toukanlabsdocker/oe-web-live
 
 ###########  Database Bootstrap image
 
@@ -109,7 +109,7 @@ jobs:
         id: meta-dbboot
         uses: docker/metadata-action@v3
         with:
-          images: biskyt/oe-db-bootstrap
+          images: toukanlabsdocker/oe-db-bootstrap
           # Only apply the latest tag to the master branch
           flavor: |
             latest=${{ contains(github.ref,'refs/heads/master') }}
@@ -129,22 +129,22 @@ jobs:
           ssh: |
               default=${{ env.SSH_AUTH_SOCK }}
           context: ./DatabaseBootstrap
-          push: false
+          push: true
           build-args: | # Note that OE_VERSION must use GITHUB_REF_SLUG, not GITHUB_REF_NAME, becuse /'s get converted to -'s
             BUILD_BRANCH=${{ env.GITHUB_REF_NAME }}
             MODULES=
             OE_VERSION=${{ env.GITHUB_REF_SLUG }}
-            BASEIMAGE=biskyt/oe-web-live
+            BASEIMAGE=toukanlabsdocker/oe-web-live
           tags: ${{ steps.meta-dbboot.outputs.tags }}
           labels: ${{ steps.meta-dbboot.outputs.labels }}
 
-      # - name: Update Docker Hub Description for DatabaseBootstrap image
-      #   uses: peter-evans/dockerhub-description@v2
-      #   with:
-      #     readme-filepath: ./DatabaseBootstrap/README.md
-      #     username: ${{ secrets.DOCKER_USERNAME }}
-      #     password: ${{ secrets.DOCKER_PASSWORD }}
-      #     repository: biskyt/oe-db-bootstrap
+      - name: Update Docker Hub Description for DatabaseBootstrap image
+        uses: peter-evans/dockerhub-description@v2
+        with:
+          readme-filepath: ./DatabaseBootstrap/README.md
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: toukanlabsdocker/oe-db-bootstrap
 
 
 # THE NEXT 2 IMAGES ARE NOT YET READY OR NEEDED, so are commented out at this time
@@ -155,7 +155,7 @@ jobs:
 #         id: meta-dev
 #         uses: docker/metadata-action@v3
 #         with:
-#           images: biskyt/oe-web-dev
+#           images: toukanlabsdocker/oe-web-dev
 #           # Only apply the latest tag to the master branch
 #           flavor: |
 #             latest=${{ contains(github.ref,'refs/heads/master') }}
@@ -190,7 +190,7 @@ jobs:
 #           readme-filepath: ./Web-Dev/README.md
 #           username: ${{ secrets.DOCKER_USERNAME }}
 #           password: ${{ secrets.DOCKER_PASSWORD }}
-#           repository: biskyt/oe-web-dev
+#           repository: toukanlabsdocker/oe-web-dev
 
 # ###########  CI image
 
@@ -198,7 +198,7 @@ jobs:
 #         id: meta-CI
 #         uses: docker/metadata-action@v3
 #         with:
-#           images: biskyt/oe-web-CI
+#           images: toukanlabsdocker/oe-web-CI
 #           # Only apply the latest tag to the master branch
 #           flavor: |
 #             latest=${{ contains(github.ref,'refs/heads/master') }}
@@ -233,4 +233,4 @@ jobs:
 #           readme-filepath: ./Web-CI/README.md
 #           username: ${{ secrets.DOCKER_USERNAME }}
 #           password: ${{ secrets.DOCKER_PASSWORD }}
-#           repository: biskyt/oe-web-CI
+#           repository: toukanlabsdocker/oe-web-CI
