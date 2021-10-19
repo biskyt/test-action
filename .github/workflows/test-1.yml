@@ -81,11 +81,12 @@ jobs:
         uses: rlespinasse/github-slug-action@v3.x
 
       - name: Setup Client suffix
-        if: ${{ matrix.client-suffix }} != ''
         run: |
-          IMAGE_SUFFIX="${{ env.IMAGE_SUFFIX }}-${{ matrix.client-suffix }}"
-          echo "IMAGE_SUFFIX set to: ${IMAGE_SUFFIX}"
-          echo "IMAGE_SUFFIX=${IMAGE_SUFFIX}" >> $GITHUB_ENV
+          if [ -n "${{ matrix.client-suffix }}" ]; then
+            IMAGE_SUFFIX="${{ env.IMAGE_SUFFIX }}-${{ matrix.client-suffix }}"
+            echo "IMAGE_SUFFIX set to: ${IMAGE_SUFFIX}"
+            echo "IMAGE_SUFFIX=${IMAGE_SUFFIX}" >> $GITHUB_ENV
+          fi
 
       - name: Setup PHP suffix
         run: | 
