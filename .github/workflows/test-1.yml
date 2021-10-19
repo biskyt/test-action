@@ -88,11 +88,12 @@ jobs:
           echo "IMAGE_SUFFIX=${IMAGE_SUFFIX}" >> $GITHUB_ENV
 
       - name: Setup PHP suffix
-        if: ( ${{ matrix.php-version }} != '' && ${{ matrix.php-version }} != {{ env.PRIMARY_PHP_VERSION }} )
         run: | 
-          IMAGE_SUFFIX="${{ env.IMAGE_SUFFIX }}-${{ matrix.php-version }}"
-          echo "IMAGE_SUFFIX set to: ${IMAGE_SUFFIX}"
-          echo "IMAGE_SUFFIX=${IMAGE_SUFFIX}" >> $GITHUB_ENV
+          if [ -n "${{ matrix.php-version }}" ] && [ "${{ matrix.php-version }}" != "${{ env.PRIMARY_PHP_VERSION }}" ]; then
+            IMAGE_SUFFIX="${{ env.IMAGE_SUFFIX }}-${{ matrix.php-version }}"
+            echo "IMAGE_SUFFIX set to: ${IMAGE_SUFFIX}"
+            echo "IMAGE_SUFFIX=${IMAGE_SUFFIX}" >> $GITHUB_ENV
+          fi
 
       - name: Log in to Docker Hub
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
