@@ -52,18 +52,18 @@ jobs:
           - client-suffix: ''
             modules: ''
             php-version: "7.4"
-          # - client-suffix: ''
-          #   modules: ''
-          #   php-version: "8.0"
+          # # - client-suffix: ''
+          # #   modules: ''
+          # #   php-version: "8.0"
+          # # - client-suffix: 'meh'
+          # #   modules: 'OphLeEpatientletter,OphInMehPac,mehstaffdb,OphInCocoa=\OEModule\OphInCocoa\OphInCocoaModule::class'
+          # #   php-version: "8.0"
           # - client-suffix: 'meh'
           #   modules: 'OphLeEpatientletter,OphInMehPac,mehstaffdb,OphInCocoa=\OEModule\OphInCocoa\OphInCocoaModule::class'
-          #   php-version: "8.0"
-          - client-suffix: 'meh'
-            modules: 'OphLeEpatientletter,OphInMehPac,mehstaffdb,OphInCocoa=\OEModule\OphInCocoa\OphInCocoaModule::class'
-            php-version: "7.4"
-          - client-suffix: 'wales'
-            modules: 'SupCoPhonelog,OphInKowastereo'
-            php-version: "7.4"
+          #   php-version: "7.4"
+          # - client-suffix: 'wales'
+          #   modules: 'SupCoPhonelog,OphInKowastereo'
+          #   php-version: "7.4"
           
     steps:
       
@@ -228,7 +228,7 @@ jobs:
         with:
           ssh: |
               default=${{ env.SSH_AUTH_SOCK }}
-          context: ./Web-Debug
+          context: ./Web-Dev
           push: false
           # Note that BASE_IMAGE_TAG must use GITHUB_REF_SLUG, not GITHUB_REF_NAME, becuse /'s get converted to -'s
           # PROD_DEBUG=true tells the dockerfile to build a debug image rather than a blank development image
