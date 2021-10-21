@@ -42,24 +42,24 @@ jobs:
       
     strategy:
       matrix:
-        php-version: [ "7.4", "8.0" ]
-        client-suffix: [ '' ]
-        modules: ['']
         ## Setup the differnt build jobs. These can specify: 
         #   - a special client build ONLY WHEN A SPECIFIC CLIENT REQUIRES ADDITIONAL CUSTOM MODULES
         #        - In which case, "modules" should be specified as a comma separated string, and can include
         #          class namespacing in the format <module>=<class>
         #   - a diffenerent PHP version
         include:
-          # - client-suffix: ''
-          #   modules: ''
-          #   # php-version: ${{ env.PRIMARY_PHP_VERSION }}
+          - client-suffix: ''
+            modules: ''
+            php-version: ${{ env.PRIMARY_PHP_VERSION }}
+          - client-suffix: ''
+            modules: ''
+            php-version: 8.0
           - client-suffix: 'meh'
             modules: 'OphLeEpatientletter,OphInMehPac,mehstaffdb,OphInCocoa=\OEModule\OphInCocoa\OphInCocoaModule::class'
-            # php-version: ${{ env.PRIMARY_PHP_VERSION }}
+            php-version: ${{ env.PRIMARY_PHP_VERSION }}
           - client-suffix: 'wales'
             modules: 'SupCoPhonelog,OphInKowastereo'
-            # php-version: ${{ env.PRIMARY_PHP_VERSION }}
+            php-version: ${{ env.PRIMARY_PHP_VERSION }}
           
     steps:
       
