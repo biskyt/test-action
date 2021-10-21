@@ -28,51 +28,51 @@ on:
       - "*"
 
 jobs:
-#   build_and_push_to_registry:
-#     if: ( github.repository == 'openeyes/OpenEyes' || github.repository == 'biskyt/test-action' )
-#     name: Build and push production images
-#     runs-on: ubuntu-latest
-#     env:
-#       PRIMARY_PHP_VERSION: "7.4"
-#       DOCKER_ORG: "biskyt"
-#       # DOCKER_ORG: "${{ env.GITHUB_DOCKER_ORG }}"
-#       DOCKER_WEB_IMAGE: "oe-web"
-#       DOCKER_BOOTSTRAP_IMAGE: "oe-db-bootstrap"
-#       IMAGE_SUFFIX: ""
+  build_and_push_to_registry:
+    if: ( github.repository == 'openeyes/OpenEyes' || github.repository == 'biskyt/test-action' )
+    name: Build and push production images
+    runs-on: ubuntu-latest
+    env:
+      PRIMARY_PHP_VERSION: "7.4"
+      DOCKER_ORG: "biskyt"
+      # DOCKER_ORG: "${{ env.GITHUB_DOCKER_ORG }}"
+      DOCKER_WEB_IMAGE: "oe-web"
+      DOCKER_BOOTSTRAP_IMAGE: "oe-db-bootstrap"
+      IMAGE_SUFFIX: ""
       
-#     strategy:
-#       fail-fast: false  
-#       matrix:
-#         ## Setup the differnt build jobs. These can specify: 
-#         #   - a special client build ONLY WHEN A SPECIFIC CLIENT REQUIRES ADDITIONAL CUSTOM MODULES
-#         #        - In which case, "modules" should be specified as a comma separated string, and can include
-#         #          class namespacing in the format <module>=<class>
-#         #   - a diffenerent PHP version
-#         include:
-#           - client-suffix: ''
-#             modules: ''
-#             php-version: "7.4"
-#           # # - client-suffix: ''
-#           # #   modules: ''
-#           # #   php-version: "8.0"
-#           # # - client-suffix: 'meh'
-#           # #   modules: 'OphLeEpatientletter,OphInMehPac,mehstaffdb,OphInCocoa=\OEModule\OphInCocoa\OphInCocoaModule::class'
-#           # #   php-version: "8.0"
-#           # - client-suffix: 'meh'
-#           #   modules: 'OphLeEpatientletter,OphInMehPac,mehstaffdb,OphInCocoa=\OEModule\OphInCocoa\OphInCocoaModule::class'
-#           #   php-version: "7.4"
-#           # - client-suffix: 'wales'
-#           #   modules: 'SupCoPhonelog,OphInKowastereo'
-#           #   php-version: "7.4"
+    strategy:
+      fail-fast: false  
+      matrix:
+        ## Setup the differnt build jobs. These can specify: 
+        #   - a special client build ONLY WHEN A SPECIFIC CLIENT REQUIRES ADDITIONAL CUSTOM MODULES
+        #        - In which case, "modules" should be specified as a comma separated string, and can include
+        #          class namespacing in the format <module>=<class>
+        #   - a diffenerent PHP version
+        include:
+          - client-suffix: ''
+            modules: ''
+            php-version: "7.4"
+          # # - client-suffix: ''
+          # #   modules: ''
+          # #   php-version: "8.0"
+          # # - client-suffix: 'meh'
+          # #   modules: 'OphLeEpatientletter,OphInMehPac,mehstaffdb,OphInCocoa=\OEModule\OphInCocoa\OphInCocoaModule::class'
+          # #   php-version: "8.0"
+          # - client-suffix: 'meh'
+          #   modules: 'OphLeEpatientletter,OphInMehPac,mehstaffdb,OphInCocoa=\OEModule\OphInCocoa\OphInCocoaModule::class'
+          #   php-version: "7.4"
+          # - client-suffix: 'wales'
+          #   modules: 'SupCoPhonelog,OphInKowastereo'
+          #   php-version: "7.4"
           
-#     steps:
+    steps:
       
-#       - name: Checkout OEBuilder
-#         uses: actions/checkout@v2
-#         with:
-#           repository: ToukanLabs/OEImageBuilder
-#           ref: master
-#           ssh-key: ${{ secrets.TKL_DEPLOY_PRIVATE_KEY }}
+      - name: Checkout OEBuilder
+        uses: actions/checkout@v2
+        with:
+          repository: ToukanLabs/OEImageBuilder
+          ref: master
+          ssh-key: ${{ secrets.TKL_DEPLOY_PRIVATE_KEY }}
 
 #       - name: Setup SSH Agent
 #         uses: webfactory/ssh-agent@v0.5.3
@@ -292,12 +292,14 @@ jobs:
 
 
   update-readmes:
-    # if: ${{ success() }}
-    # needs: push_to_registry
+    if: ${{ success() }}
+    needs: push_to_registry
     name: Update Docker Hub Description for images
     runs-on: ubuntu-latest
     env:
-      DOCKER_ORG: "toukanlabsdocker"
+      # DOCKER_ORG: "toukanlabsdocker"
+      DOCKER_ORG: ${{ jobs.build_and_push_to_registry.env.DOCKER_ORG }}
+
       DOCKER_WEB_IMAGE: "oe-web-live"
       DOCKER_BOOTSTRAP_IMAGE: "oe-db-bootstrap"
       IMAGE_SUFFIX: ""
