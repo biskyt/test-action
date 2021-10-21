@@ -212,7 +212,7 @@ jobs:
           flavor: |
             latest=${{ (contains(github.ref,'refs/heads/master') && ! fromJSON(steps.setsuffix.outputs.hassuffix)) && true || false }}
             suffix=${{ env.IMAGE_SUFFIX }}
-            prefix=debug-
+            prefix=debug-,onlatest=true
           # set tags to symantic versions for each release.
           # NOTE: for semver, the tag must contain 3x parts 1.2.3 (e.g v4.1.0)
           tags: |
