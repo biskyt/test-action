@@ -173,7 +173,7 @@ jobs:
           images: ${{ env.DOCKER_ORG }}/${{ env.DOCKER_BOOTSTRAP_IMAGE }}
           # Only apply the latest tag to the master branch
           flavor: |
-            latest=(${{ contains(github.ref,'refs/heads/master') }} && !${{ fromJSON(steps.setsuffix.outputs.hassuffix) }})
+            latest=[ ${{ contains(github.ref,'refs/heads/master') }} && !${{ fromJSON(steps.setsuffix.outputs.hassuffix) }} ]
             suffix=${{ env.IMAGE_SUFFIX }}
           # set tags to symantic versions for each release.
           # NOTE: for semver, the tag must contain 3x parts 1.2.3 (e.g v4.1.0)
