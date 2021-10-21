@@ -93,15 +93,15 @@ jobs:
             [[ -n "$PHP_VERSION" && "$PHP_VERSION" != "$PRIMARY_PHP_VERSION" ]] && IMAGE_SUFFIX="$IMAGE_SUFFIX-php$PHP_VERSION" || :
             
             if [ -n "$IMAGE_SUFFIX" ]; then
-              echo ::set-output name=hassuffix::true
+              echo ::set-output name=hassuffix::${{ toJSON(true) }}
               echo "IMAGE_SUFFIX=${IMAGE_SUFFIX}" >> $GITHUB_ENV
               echo "IMAGE_SUFFIX set to: ${IMAGE_SUFFIX}"
             else
-              echo ::set-output name=hassuffix::false
+              echo ::set-output name=hassuffix::${{ toJSON(false) }}
             fi
 
           else
-            echo ::set-output name=hassuffix::false
+            echo ::set-output name=hassuffix::${{ toJSON(false) }}
           fi
         env:
           CLIENT_SUFFIX: ${{ matrix.client-suffix }}
@@ -131,7 +131,7 @@ jobs:
           # Only apply the latest tag to the master branch
           # add suffix for any client or php-version specific images
           flavor: |
-            latest=${{ (contains(github.ref,'refs/heads/master') && ! steps.setsuffix.outputs.hassuffix) && true || false }}
+            latest=${{ (contains(github.ref,'refs/heads/master') && ! fromJSON(steps.setsuffix.outputs.hassuffix)) && true || false }}
             suffix=${{ env.IMAGE_SUFFIX }}
           # set tags to symantic versions for each release.
           # NOTE: for semver, the tag must contain 3x parts 1.2.3 (e.g v4.1.0)
@@ -173,7 +173,7 @@ jobs:
           images: ${{ env.DOCKER_ORG }}/${{ env.DOCKER_BOOTSTRAP_IMAGE }}
           # Only apply the latest tag to the master branch
           flavor: |
-            latest=${{ (contains(github.ref,'refs/heads/master') && ! steps.setsuffix.outputs.hassuffix) && true || false }}
+            latest=[ ${{ contains(github.ref,'refs/heads/master') }} && !${{ fromJSON(steps.setsuffix.outputs.hassuffix) }} ]
             suffix=${{ env.IMAGE_SUFFIX }}
           # set tags to symantic versions for each release.
           # NOTE: for semver, the tag must contain 3x parts 1.2.3 (e.g v4.1.0)
