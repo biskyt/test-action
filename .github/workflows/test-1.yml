@@ -41,6 +41,7 @@ jobs:
       IMAGE_SUFFIX: ""
       
     strategy:
+      fail-fast: false  
       matrix:
         ## Setup the differnt build jobs. These can specify: 
         #   - a special client build ONLY WHEN A SPECIFIC CLIENT REQUIRES ADDITIONAL CUSTOM MODULES
@@ -153,6 +154,7 @@ jobs:
           build-args: |
             BUILD_BRANCH=${{ env.GITHUB_REF_NAME }}
             MODULES=${{ matrix.modules }}
+            PHP_VERSION=${{ matrix.php-version }}
           tags: ${{ steps.meta-live.outputs.tags }}
           labels: ${{ steps.meta-live.outputs.labels }}
 
@@ -197,6 +199,7 @@ jobs:
             MODULES=${{ matrix.modules }}
             OE_VERSION=${{ env.GITHUB_REF_SLUG }}${{ env.IMAGE_SUFFIX }}
             BASEIMAGE=${{ env.DOCKER_ORG }}/${{ env.DOCKER_WEB_IMAGE }}
+            PHP_VERSION=${{ matrix.php-version }}
           tags: ${{ steps.meta-dbboot.outputs.tags }}
           labels: ${{ steps.meta-dbboot.outputs.labels }}
 
