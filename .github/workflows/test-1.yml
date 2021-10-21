@@ -125,9 +125,8 @@ jobs:
           # driver: docker is required to allow images to be reused by subsequent steps
           driver: docker
 
-###########  Live image
-
-      - name: Setup Docker metadata tags for Live image
+########### Setup tags for each image
+      - name: Setup metadata tags for LIVE image
         id: meta-live
         uses: docker/metadata-action@v3
         with:
@@ -147,23 +146,7 @@ jobs:
             type=semver,pattern=v{{major}}
             type=edge,branch=develop
 
-      - name: Build and push Live image
-        uses: docker/build-push-action@v2
-        with:
-          ssh: |
-              default=${{ env.SSH_AUTH_SOCK }}
-          context: ./Web-Live
-          push: true
-          build-args: |
-            BUILD_BRANCH=${{ env.GITHUB_REF_NAME }}
-            MODULES=${{ matrix.modules }}
-            PHP_VERSION=${{ matrix.php-version }}
-          tags: ${{ steps.meta-live.outputs.tags }}
-          labels: ${{ steps.meta-live.outputs.labels }}
-
-###########  Database Bootstrap image
-
-      - name: Setup Docker metadata tags for DatabaseBootstrap image
+      - name: Setup metadata for DatabaseBootstrap image
         id: meta-dbboot
         uses: docker/metadata-action@v3
         with:
@@ -181,27 +164,8 @@ jobs:
             type=semver,pattern=v{{major}}.{{minor}}
             type=semver,pattern=v{{major}}
             type=edge,branch=develop
-
-      - name: Build and push DatabaseBootstrap image
-        uses: docker/build-push-action@v2
-        with:
-          ssh: |
-              default=${{ env.SSH_AUTH_SOCK }}
-          context: ./DatabaseBootstrap
-          push: false
-          build-args: | # Note that OE_VERSION must use GITHUB_REF_SLUG, not GITHUB_REF_NAME, becuse /'s get converted to -'s
-            BUILD_BRANCH=${{ env.GITHUB_REF_NAME }}
-            MODULES=${{ matrix.modules }}
-            OE_VERSION=${{ env.GITHUB_REF_SLUG }}${{ env.IMAGE_SUFFIX }}
-            BASEIMAGE=${{ env.DOCKER_ORG }}/${{ env.DOCKER_WEB_IMAGE }}
-            PHP_VERSION=${{ matrix.php-version }}
-          tags: ${{ steps.meta-dbboot.outputs.tags }}
-          labels: ${{ steps.meta-dbboot.outputs.labels }}
-          
-###########  Debug image
-# Debug images contain the same code as the live image, but include additional debugging tools and run in dev mode
-
-      - name: Setup Docker metadata tags for Debug image
+        
+      - name: Setup metadata tags for DEBUG image
         id: meta-debug
         uses: docker/metadata-action@v3
         with:
@@ -223,7 +187,42 @@ jobs:
             type=semver,pattern=v{{major}}
             type=edge,branch=develop
 
-      - name: Build and push Debug image
+###########  Build images
+
+      - name: Build LIVE image
+        uses: docker/build-push-action@v2
+        with:
+          ssh: |
+              default=${{ env.SSH_AUTH_SOCK }}
+          context: ./Web-Live
+          push: false
+          build-args: |
+            BUILD_BRANCH=${{ env.GITHUB_REF_NAME }}
+            MODULES=${{ matrix.modules }}
+            PHP_VERSION=${{ matrix.php-version }}
+          tags: ${{ steps.meta-live.outputs.tags }}
+          labels: ${{ steps.meta-live.outputs.labels }}
+
+      - name: Build DatabaseBootstrap image
+        uses: docker/build-push-action@v2
+        with:
+          ssh: |
+              default=${{ env.SSH_AUTH_SOCK }}
+          context: ./DatabaseBootstrap
+          push: false
+          build-args: | # Note that OE_VERSION must use GITHUB_REF_SLUG, not GITHUB_REF_NAME, becuse /'s get converted to -'s
+            BUILD_BRANCH=${{ env.GITHUB_REF_NAME }}
+            MODULES=${{ matrix.modules }}
+            OE_VERSION=${{ env.GITHUB_REF_SLUG }}${{ env.IMAGE_SUFFIX }}
+            BASEIMAGE=${{ env.DOCKER_ORG }}/${{ env.DOCKER_WEB_IMAGE }}
+            PHP_VERSION=${{ matrix.php-version }}
+          tags: ${{ steps.meta-dbboot.outputs.tags }}
+          labels: ${{ steps.meta-dbboot.outputs.labels }}
+          
+###########  Debug image
+# Debug images contain the same code as the live image, but include additional debugging tools and run in dev mode
+
+      - name: Build DEBUG image
         uses: docker/build-push-action@v2
         with:
           ssh: |
@@ -241,10 +240,61 @@ jobs:
           tags: ${{ steps.meta-debug.outputs.tags }}
           labels: ${{ steps.meta-debug.outputs.labels }}
 
+########### Push final images to docker registry
+
+      - name: Push Live image
+        uses: docker/build-push-action@v2
+        with:
+          ssh: |
+              default=${{ env.SSH_AUTH_SOCK }}
+          context: ./Web-Live
+          push: true
+          build-args: |
+            BUILD_BRANCH=${{ env.GITHUB_REF_NAME }}
+            MODULES=${{ matrix.modules }}
+            PHP_VERSION=${{ matrix.php-version }}
+          tags: ${{ steps.meta-live.outputs.tags }}
+          labels: ${{ steps.meta-live.outputs.labels }}
+
+      - name: Push DatabaseBootstrap image
+        uses: docker/build-push-action@v2
+        with:
+          ssh: |
+              default=${{ env.SSH_AUTH_SOCK }}
+          context: ./DatabaseBootstrap
+          push: false
+          build-args: | # Note that OE_VERSION must use GITHUB_REF_SLUG, not GITHUB_REF_NAME, becuse /'s get converted to -'s
+            BUILD_BRANCH=${{ env.GITHUB_REF_NAME }}
+            MODULES=${{ matrix.modules }}
+            OE_VERSION=${{ env.GITHUB_REF_SLUG }}${{ env.IMAGE_SUFFIX }}
+            BASEIMAGE=${{ env.DOCKER_ORG }}/${{ env.DOCKER_WEB_IMAGE }}
+            PHP_VERSION=${{ matrix.php-version }}
+          tags: ${{ steps.meta-dbboot.outputs.tags }}
+          labels: ${{ steps.meta-dbboot.outputs.labels }}
+
+      - name: Push DEBUG image
+        uses: docker/build-push-action@v2
+        with:
+          ssh: |
+              default=${{ env.SSH_AUTH_SOCK }}
+          context: ./Web-Dev
+          push: false
+          # Note that BASE_IMAGE_TAG must use GITHUB_REF_SLUG, not GITHUB_REF_NAME, becuse /'s get converted to -'s
+          # PROD_DEBUG=true tells the dockerfile to build a debug image rather than a blank development image
+          build-args: | 
+            BUILD_BRANCH=${{ env.GITHUB_REF_NAME }}
+            BASE_IMAGE_NAME=${{ env.DOCKER_ORG }}/${{ env.DOCKER_WEB_IMAGE }}
+            BASE_IMAGE_TAG=${{ env.GITHUB_REF_SLUG }}${{ env.IMAGE_SUFFIX }}
+            PHP_VERSION=${{ matrix.php-version }}
+            PROD_DEBUG=TRUE
+          tags: ${{ steps.meta-debug.outputs.tags }}
+          labels: ${{ steps.meta-debug.outputs.labels }}
+
+
   update-readmes:
     if: ${{ success() }}
     needs: push_to_registry
-    name: Update Docker Hub Description for Live image
+    name: Update Docker Hub Description for images
     runs-on: ubuntu-latest
     steps:
       - name: Checkout OEBuilder
@@ -253,11 +303,14 @@ jobs:
           repository: ToukanLabs/OEImageBuilder
           ref: master
           ssh-key: ${{ secrets.TKL_DEPLOY_PRIVATE_KEY }}
+      
+      - name: list folder contents
+        run: ls -la
 
       - name: Live ReadMe
         uses: peter-evans/dockerhub-description@v2
         with:
-          readme-filepath: ./DatabaseBootstrap/README.md
+          readme-filepath: ./Web-Dev/README.md
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: ${{ env.DOCKER_ORG }}/${{ env.DOCKER_WEB_IMAGE }}
@@ -265,7 +318,7 @@ jobs:
       - name: Bootstrap ReadMe
         uses: peter-evans/dockerhub-description@v2
         with:
-          readme-filepath: ./Web-Live/README.md
+          readme-filepath: ./DatabaseBootstrap/README.md
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
           repository: ${{ env.DOCKER_ORG }}/${{ env.DOCKER_WEB_IMAGE }} 
