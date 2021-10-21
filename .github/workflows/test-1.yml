@@ -237,7 +237,7 @@ jobs:
             BASE_IMAGE_NAME=${{ env.DOCKER_ORG }}/${{ env.DOCKER_WEB_IMAGE }}
             BASE_IMAGE_TAG=${{ env.GITHUB_REF_SLUG }}${{ env.IMAGE_SUFFIX }}
             PHP_VERSION=${{ matrix.php-version }}
-            PROD_DEBUG=true
+            PROD_DEBUG=TRUE
           tags: ${{ steps.meta-debug.outputs.tags }}
           labels: ${{ steps.meta-debug.outputs.labels }}
 
