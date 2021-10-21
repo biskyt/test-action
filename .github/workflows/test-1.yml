@@ -52,12 +52,12 @@ jobs:
           - client-suffix: ''
             modules: ''
             php-version: "7.4"
-          - client-suffix: ''
-            modules: ''
-            php-version: "8.0"
-          - client-suffix: 'meh'
-            modules: 'OphLeEpatientletter,OphInMehPac,mehstaffdb,OphInCocoa=\OEModule\OphInCocoa\OphInCocoaModule::class'
-            php-version: "8.0"
+          # - client-suffix: ''
+          #   modules: ''
+          #   php-version: "8.0"
+          # - client-suffix: 'meh'
+          #   modules: 'OphLeEpatientletter,OphInMehPac,mehstaffdb,OphInCocoa=\OEModule\OphInCocoa\OphInCocoaModule::class'
+          #   php-version: "8.0"
           - client-suffix: 'meh'
             modules: 'OphLeEpatientletter,OphInMehPac,mehstaffdb,OphInCocoa=\OEModule\OphInCocoa\OphInCocoaModule::class'
             php-version: "7.4"
@@ -79,7 +79,7 @@ jobs:
         with:
             ssh-private-key: ${{ secrets.TKL_DEPLOY_PRIVATE_KEY }}
 
-      # Resolve the github ref to use as a buiold arg in following step(s)
+      # Resolve the github ref to use as a build arg in following step(s)
       # This creates ${{ env.GITHUB_REF_NAME }} with the correct branch or tag name
       - name: Resolve ref
         uses: rlespinasse/github-slug-action@v3.x
@@ -122,8 +122,8 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
         with:
-          driver: docker
           # driver: docker is required to allow images to be reused by subsequent steps
+          driver: docker
 
 ###########  Live image
 
@@ -161,13 +161,7 @@ jobs:
           tags: ${{ steps.meta-live.outputs.tags }}
           labels: ${{ steps.meta-live.outputs.labels }}
 
-      # - name: Update Docker Hub Description for Live image
-      #   uses: peter-evans/dockerhub-description@v2
-      #   with:
-      #     readme-filepath: ./Web-Live/README.md
-      #     username: ${{ secrets.DOCKER_USERNAME }}
-      #     password: ${{ secrets.DOCKER_PASSWORD }}
-      #     repository: ${{ env.DOCKER_ORG }}/${{ env.DOCKER_WEB_IMAGE }}
+      
 
 ###########  Database Bootstrap image
 
@@ -214,5 +208,17 @@ jobs:
       #     password: ${{ secrets.DOCKER_PASSWORD }}
       #     repository: ${{ env.DOCKER_ORG }}/${{ env.DOCKER_BOOTSTRAP_IMAGE }}
 
-
+  update-live-readme:
+    if: ${{ success() }}
+    needs: push_to_registry
+    name: Update Docker Hub Description for Live image
+    runs-on: ubuntu-latest
+    steps:
+      -
+        uses: peter-evans/dockerhub-description@v2
+        with:
+          readme-filepath: ./Web-Live/README.md
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ env.DOCKER_ORG }}/${{ env.DOCKER_WEB_IMAGE }}
 
