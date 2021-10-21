@@ -51,16 +51,16 @@ jobs:
         include:
           - client-suffix: ''
             modules: ''
-            php-version: 7.4
+            php-version: "7.4"
           - client-suffix: ''
             modules: ''
-            php-version: 8.0
+            php-version: "8.0"
           - client-suffix: 'meh'
             modules: 'OphLeEpatientletter,OphInMehPac,mehstaffdb,OphInCocoa=\OEModule\OphInCocoa\OphInCocoaModule::class'
-            php-version: 7.4
+            php-version: "7.4"
           - client-suffix: 'wales'
             modules: 'SupCoPhonelog,OphInKowastereo'
-            php-version: 7.4
+            php-version: "7.4"
           
     steps:
       
