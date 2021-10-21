@@ -82,21 +82,32 @@ jobs:
 
       - name: Setup image suffix
         id: setsuffix
+        shell: bash
         run: |
           if [ -n "$CLIENT_SUFFIX" ] || [ -n "$PHP_VERSION" ]; then
+            
+            # Set client prefix if specified
             [ -n "$CLIENT_SUFFIX" ] && IMAGE_SUFFIX="$IMAGE_SUFFIX-$CLIENT_SUFFIX" || :
+            
+            # set php version prefix if specified. Do not set a prefix if this is the primary version
             [[ -n "$PHP_VERSION" && "$PHP_VERSION" != "$PRIMARY_PHP_VERSION" ]] && IMAGE_SUFFIX="$IMAGE_SUFFIX-php$PHP_VERSION" || :
-            echo "IMAGE_SUFFIX set to: ${IMAGE_SUFFIX}"
-            echo "IMAGE_SUFFIX=${IMAGE_SUFFIX}" >> $GITHUB_ENV
-            [ -n "$IMAGE_SUFFIX" ] && echo ::set-output name=hassuffix::true || echo ::set-output name=hassuffix::false
+            
+            if [ -n "$IMAGE_SUFFIX" ]; then
+              echo ::set-output name=hassuffix::true
+              echo "IMAGE_SUFFIX=${IMAGE_SUFFIX}" >> $GITHUB_ENV
+              echo "IMAGE_SUFFIX set to: ${IMAGE_SUFFIX}"
+            else
+              echo ::set-output name=hassuffix::false
+            fi
+
           else
             echo ::set-output name=hassuffix::false
           fi
-        env:
-          CLIENT_SUFFIX: ${{ matrix.client-suffix }}
-          PHP_VERSION: ${{ matrix.php-version }}
-          IMAGE_SUFFIX: ${{ env.IMAGE_SUFFIX }}
-          PRIMARY_PHP_VERSION: ${{ env.PRIMARY_PHP_VERSION }}
+        # env:
+        #   CLIENT_SUFFIX: ${{ matrix.client-suffix }}
+        #   PHP_VERSION: ${{ matrix.php-version }}
+        #   IMAGE_SUFFIX: ${{ env.IMAGE_SUFFIX }}
+        #   PRIMARY_PHP_VERSION: ${{ env.PRIMARY_PHP_VERSION }}
 
       - name: Log in to Docker Hub
         uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
