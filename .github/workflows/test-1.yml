@@ -1,6 +1,8 @@
 name: Testing123
 on:
   repository_dispatch:
+  workflow_dispatch:
+    
     
 jobs:
   test-action:
