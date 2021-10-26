@@ -1,4 +1,17 @@
-name: Publish Docker images
+name: Testing123
+on:
+  repository_dispatch:
+    
+jobs:
+  test-action:
+    runs-on: ubuntu-latest
+    steps:
+      - shell: bash
+        run: |
+          echo "this worked"
+
+
+# name: Publish Docker images
 
 ## Builds deployable images for the OE application.
 ## For production scenarios, always try to tag the repo, which will cfreate a tagged image
@@ -15,18 +28,6 @@ name: Publish Docker images
   ## - "bugfix/*"
 ##
 ## The 'latest' tag is applied to master branch image. Again, this should never be used in production
-
-on:
-  repository_dispatch:
-    
-jobs:
-  test-action:
-    runs-on: ubuntu-latest
-    steps:
-      - shell: bash
-        run: |
-          echo "this worked"
-
 
 # on:
 #   push:
