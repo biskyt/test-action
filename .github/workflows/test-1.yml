@@ -10,9 +10,14 @@ jobs:
     env:
         GITHUB_CONTEXT: ${{ toJson(github) }}
     steps:
-      - shell: bash
+      
+      - name: Resolve ref
+        uses: rlespinasse/github-slug-action@v3.x
+
+      - name: debug output
+        shell: bash
         run: |
-          echo "this worked"
+          echo "this worked for ${{ env.GITHUB_REF_NAME }}"
           echo "$GITHUB_CONTEXT"
 
 
