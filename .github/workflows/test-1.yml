@@ -7,10 +7,13 @@ on:
 jobs:
   test-action:
     runs-on: ubuntu-latest
+    env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
     steps:
       - shell: bash
         run: |
           echo "this worked"
+          echo "$GITHUB_CONTEXT"
 
 
 # name: Publish Docker images
