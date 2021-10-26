@@ -7,23 +7,23 @@ on:
 jobs:
   test-action:
     runs-on: ubuntu-latest
-
+    env:
+      GITHUB_REF_SLUG: ${{ github.event.client_payload.message.GITHUB_REF_SLUG }}
+      GITHUB_REF_NAME: ${{ github.event.client_payload.message.GITHUB_REF_NAME }}
     steps:
       
       - name: Checkout
         uses: actions/checkout@v2
         with:
           repository: 'biskyt/test-trigger-action'
-          ref: ${{ github.event.client_payload.ref }}
+          ref: ${{ env.GITHUB_REF_NAME }}
           ssh-key: ${{ secrets.TKL_DEPLOY_PRIVATE_KEY }}
       
-      - name: Resolve ref
-        uses: rlespinasse/github-slug-action@v3.x
 
       - name: debug output
         shell: bash
         run: |
-          echo "this worked for ${{ env.GITHUB_REF_NAME }}"
+          echo "this worked for ${{ env.GITHUB_REF_NAME }}, with slug: ${{ env.GITHUB_REF_SLUG }}" 
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
 
