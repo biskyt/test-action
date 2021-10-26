@@ -11,6 +11,13 @@ jobs:
         GITHUB_CONTEXT: ${{ toJson(github) }}
     steps:
       
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          repository: 'biskyt/test-trigger-action'
+          ref: ${{ github.client_payload.event.ref }}
+          ssh-key: ${{ secrets.TKL_DEPLOY_PRIVATE_KEY }}
+      
       - name: Resolve ref
         uses: rlespinasse/github-slug-action@v3.x
 
