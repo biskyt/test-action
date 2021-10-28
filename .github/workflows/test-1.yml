@@ -60,7 +60,7 @@ jobs:
               tags+="${prefix}edge${suffix}\n"
           fi
 
-          echo ::set-output tags="$tags"
+          echo ::set-output tags::"$tags"
 
 
       - name: debug output
