@@ -19,48 +19,53 @@ jobs:
           ref: ${{ env.GITHUB_REF_NAME }}
           ssh-key: ${{ secrets.TKL_DEPLOY_PRIVATE_KEY }}
       
-      - name: Generate tags
+      - name: Generate live image tags
         id: meta-live
-        env:
-          slug: "${{ env.GITHUB_REF_SLUG }}"
-          prefix: ""
-          suffix: "${{ matrix.client-suffix }}"
-        run: |
-          tags=''
+        uses: toukanlabs/build-tag-gen@v1
 
-          [ -n "$prefix" ] && prefix="$prefix-" || :
-          [ -n "$suffix" ] && suffix="-$suffix" || :
+      # - name: Generate tags
+      #   id: meta-live
+      #   env:
+      #     slug: "${{ env.GITHUB_REF_SLUG }}"
+      #     prefix: ""
+      #     suffix: "${{ matrix.client-suffix }}"
+      #   run: |
+      #     tags=''
 
-          echo -e "SLUG WAS: $slug\n"
+      #     [ -n "$prefix" ] && prefix="$prefix-" || :
+      #     [ -n "$suffix" ] && suffix="-$suffix" || :
 
-          # Is the slug matches a semver pattern, then create major/minor version
-          if grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' <<<"$slug" >/dev/null 2>&1; then
-              # It has the correct syntax.
-              n=${slug//[!0-9]/ }
-              a=(${n//\./ })
-              major=${a[0]}
-              minor=${a[1]}
-              patch=${a[2]}
-              echo "tag was $slug"
-              tags+="${prefix}v${major}${suffix}\n"
-              tags+="${prefix}v${major}.${minor}${suffix}\n"
-              tags+="${prefix}v${major}.${minor}.${patch}${suffix}\n"
-          else
-              # main tag
-              tags+="${prefix}${slug}${suffix}\n"
-          fi
+      #     echo -e "SLUG WAS: $slug\n"
 
-          # Set "latest" tag for master branch
-          if [ "$slug" == "master" ] || [ "$slug" == "main" ]; then
-              tags+="${prefix}latest${suffix}\n"
-          fi
+      #     # Is the slug matches a semver pattern, then create major/minor version
+      #     if grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' <<<"$slug" >/dev/null 2>&1; then
+      #         # It has the correct syntax.
+      #         n=${slug//[!0-9]/ }
+      #         a=(${n//\./ })
+      #         major=${a[0]}
+      #         minor=${a[1]}
+      #         patch=${a[2]}
+      #         echo "tag was $slug"
+      #         tags+="${prefix}v${major}${suffix}\n"
+      #         tags+="${prefix}v${major}.${minor}${suffix}\n"
+      #         tags+="${prefix}v${major}.${minor}.${patch}${suffix}\n"
+      #     else
+      #         # main tag
+      #         tags+="${prefix}${slug}${suffix}\n"
+      #     fi
 
-          # Set "edge" tag for develop branch
-          if [ "$slug" == "develop" ]; then
-              tags+="${prefix}edge${suffix}\n"
-          fi
+      #     # Set "latest" tag for master branch
+      #     if [ "$slug" == "master" ] || [ "$slug" == "main" ]; then
+      #         tags+="${prefix}latest${suffix}\n"
+      #     fi
 
-          echo ::set-output name=tags::"$tags"
+      #     # Set "edge" tag for develop branch
+      #     if [ "$slug" == "develop" ]; then
+      #         tags+="${prefix}edge${suffix}\n"
+      #     fi
+          
+      #     echo ::set-output name=tags::"$tags"
+      #     echo -e "TAGS:\n$tags"
 
 
       - name: debug output
