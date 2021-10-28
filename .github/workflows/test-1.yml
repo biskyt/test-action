@@ -21,7 +21,10 @@ jobs:
       
       - name: Generate live image tags
         id: meta-live
-        uses: toukanlabs/build-tag-gen@v1
+        uses: toukanlabs/build-tag-gen
+        with:
+          slug: "${{ env.GITHUB_REF_SLUG }}"
+          # suffix: "${{ matrix.client-suffix }}"
 
       # - name: Generate tags
       #   id: meta-live
