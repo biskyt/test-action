@@ -1,7 +1,7 @@
 name: Testing123
 on:
   repository_dispatch:
-  workflow_dispatch:
+
     
     
 jobs:
@@ -19,11 +19,55 @@ jobs:
           ref: ${{ env.GITHUB_REF_NAME }}
           ssh-key: ${{ secrets.TKL_DEPLOY_PRIVATE_KEY }}
       
+      - name: Generate tags
+        id: meta-live
+        env:
+          slug: "${{ env.GITHUB_REF_SLUG }}"
+          prefix: ""
+          suffix: "${{ matrix.client-suffix }}"
+        run: |
+          tags=''
+
+          [ -n "$prefix" ] && prefix="$prefix-" || :
+          [ -n "$suffix" ] && suffix="-$suffix" || :
+
+          echo -e "SLUG WAS: $slug\n"
+
+          # Is the slug matches a semver pattern, then create major/minor version
+          if grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' <<<"$slug" >/dev/null 2>&1; then
+              # It has the correct syntax.
+              n=${slug//[!0-9]/ }
+              a=(${n//\./ })
+              major=${a[0]}
+              minor=${a[1]}
+              patch=${a[2]}
+              echo "tag was $slug"
+              tags+="${prefix}v${major}${suffix}\n"
+              tags+="${prefix}v${major}.${minor}${suffix}\n"
+              tags+="${prefix}v${major}.${minor}.${patch}${suffix}\n"
+          else
+              # main tag
+              tags+="${prefix}${slug}${suffix}\n"
+          fi
+
+          # Set "latest" tag for master branch
+          if [ "$slug" == "master" ] || [ "$slug" == "main" ]; then
+              tags+="${prefix}latest${suffix}\n"
+          fi
+
+          # Set "edge" tag for develop branch
+          if [ "$slug" == "develop" ]; then
+              tags+="${prefix}edge${suffix}\n"
+          fi
+
+          echo ::set-output tags="$tags"
+
 
       - name: debug output
         shell: bash
         run: |
           echo "this worked for ${{ env.GITHUB_REF_NAME }}, with slug: ${{ env.GITHUB_REF_SLUG }}" 
+          echo -e "TAGS:\n${{ steps.meta-live.outputs.tags }}"
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
 
